@@ -34,7 +34,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <a href="#Hero" className="flex items-center gap-2">
-  <img src="/cognera_log_bg_removed.png" alt="logo" className="h-8 w-auto" />
+  <img src="/Cognera_log_bg_removed.png" alt="logo" className="h-8 w-auto" />
   <span className="text-white font-bold text-lg tracking-tight">Cognera</span>
 </a>
 

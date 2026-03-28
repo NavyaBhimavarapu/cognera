@@ -17,7 +17,7 @@ export default function Hero(){
            Request Pilot →
          </button>
         </div>
-        <div className="flex-[45]">
+        <div className="flex-[45] hidden md:block">
            <div className="w-full rounded-lg p-4 border border-purple-400/20">
           <div className="bg-white/5 rounded-lg p-4 border border-purple-400/30">
           <p className="text-gray-400 text-xs mb-3">User sessions</p>

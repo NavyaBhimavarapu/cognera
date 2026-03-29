@@ -83,7 +83,7 @@ export default function Hero() {
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-white text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
             style={{ background: "linear-gradient(135deg, #3730A3, #4C1D95)" }}
           >
-            Request Pilot
+            get started
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M3 7h8M8 4l3 3-3 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

@@ -34,7 +34,7 @@ export default function Hero() {
           <Image src="/icon.png" alt="Cognera" width={52} height={52} />
           <span style={{
             fontFamily: "'DM Serif Display', serif",
-            fontSize: "1.75rem",
+            fontSize: "2.55rem",
             fontWeight: 400,
             color: "#0F0A1E",
             letterSpacing: "-0.01em",

@@ -64,10 +64,42 @@ const PROBLEMS = [
   },
 ];
 
+// ── Reusable hook: fires once when element enters viewport ──
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return { ref, visible };
+}
+
 export default function Problems() {
   const [active, setActive] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const TOTAL = PROBLEMS.length;
+
+  // Heading scroll trigger
+  const { ref: headingRef, visible: headingVisible } = useInView(0.2);
+
+  // Carousel scroll trigger (fires once section enters view)
+  const { ref: carouselRef, visible: carouselVisible } = useInView(0.1);
+
+  // Nav scroll trigger
+  const { ref: navRef, visible: navVisible } = useInView(0.1);
+
+  const fadeUp = (delay: number): React.CSSProperties => ({
+    opacity: headingVisible ? 1 : 0,
+    transform: headingVisible ? "translateY(0)" : "translateY(24px)",
+    transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+  });
 
   const startTimer = () => {
     timerRef.current = setInterval(() => setActive(a => (a + 1) % TOTAL), 3400);
@@ -82,11 +114,6 @@ export default function Problems() {
 
   const getStyle = (idx: number): React.CSSProperties => {
     const pos = ((idx - active) + TOTAL) % TOTAL;
-
-    // pos 0 = active center
-    // pos 1 = right peek
-    // pos 4 = left peek
-    // pos 2, 3 = hidden behind
     if (pos === 0) return {
       transform: "translateX(0) scale(1)",
       opacity: 1,
@@ -108,7 +135,6 @@ export default function Problems() {
       pointerEvents: "auto",
       boxShadow: "none",
     };
-    // all others hidden
     return {
       transform: "translateX(0) scale(0.8)",
       opacity: 0,
@@ -134,34 +160,48 @@ export default function Problems() {
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px", textAlign: "center", position: "relative", zIndex: 1 }}>
 
-        <p style={{
-          fontSize: 11, fontWeight: 700, letterSpacing: "0.12em",
-          textTransform: "uppercase", color: "#3730A3", marginBottom: 14,
-        }}>
-          The Problem
-        </p>
+        {/* ── Heading — fades in when scrolled into view ── */}
+        <div ref={headingRef}>
+          <p style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: "0.12em",
+            textTransform: "uppercase" as const, color: "#3730A3", marginBottom: 14,
+            ...fadeUp(0),
+          }}>
+            The Problem
+          </p>
 
-        <h2 style={{
-          fontFamily: "'DM Serif Display', serif",
-          fontSize: "clamp(1.9rem, 4vw, 2.8rem)",
-          fontWeight: 400, lineHeight: 1.15,
-          color: "#0F0A1E", marginBottom: 16,
-        }}>
-          The blind spots in digital analytics
-        </h2>
+          <h2 style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: "clamp(1.9rem, 4vw, 2.8rem)",
+            fontWeight: 400, lineHeight: 1.15,
+            color: "#0F0A1E", marginBottom: 16,
+            ...fadeUp(0.1),
+          }}>
+            The blind spots in digital analytics
+          </h2>
 
-        <p style={{ fontSize: "1rem", color: "#6B7280", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 56px" }}>
-          Today's tools measure clicks and events — they don't understand behavioural transitions, attention drops, or why users switch contexts.
-        </p>
+          <p style={{
+            fontSize: "1rem", color: "#6B7280", lineHeight: 1.7,
+            maxWidth: 520, margin: "0 auto 56px",
+            ...fadeUp(0.2),
+          }}>
+            Today's tools measure clicks and events — they don't understand behavioural
+            transitions, attention drops, or why users switch contexts.
+          </p>
+        </div>
 
-        {/* Carousel */}
+        {/* ── Carousel — slides up when scrolled into view ── */}
         <div
+          ref={carouselRef}
           style={{
             position: "relative",
             height: 320,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            opacity: carouselVisible ? 1 : 0,
+            transform: carouselVisible ? "translateY(0)" : "translateY(32px)",
+            transition: "opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s",
           }}
           onMouseEnter={stopTimer}
           onMouseLeave={startTimer}
@@ -208,8 +248,17 @@ export default function Problems() {
           ))}
         </div>
 
-        {/* Navigation */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 16 }}>
+        {/* ── Navigation — fades in just after carousel ── */}
+        <div
+          ref={navRef}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            gap: 12, marginTop: 16,
+            opacity: navVisible ? 1 : 0,
+            transform: navVisible ? "translateY(0)" : "translateY(16px)",
+            transition: "opacity 0.7s ease 0.35s, transform 0.7s ease 0.35s",
+          }}
+        >
           <button
             onClick={prev}
             style={{
@@ -257,6 +306,7 @@ export default function Problems() {
             </svg>
           </button>
         </div>
+
       </div>
     </section>
   );
